@@ -1,9 +1,10 @@
 ---
 - hosts: all
   user: root
+  become: yes
 
   vars:
-    elasticsearchHost: <elasticsarchHostIP>
+    elasticsearchHost: <elasticsearchHostIP>
     kibanaHost: <kibanaHostIP>
 
   tasks:
@@ -58,7 +59,10 @@
       command: cp /usr/share/filebeat/bin/filebeat /etc/filebeat
 
     - name: enable modules system
-      shell: filebeat modules enable system chdir=/etc/filebeat
+      shell: filebeat modules enable {{ item }} chdir=/etc/filebeat
+      with_items:
+        - system
+        - auditd
 
     - name: service start enable
       service: name=filebeat state=started enabled=yes
